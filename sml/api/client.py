@@ -1,12 +1,12 @@
 """ME Frp API 客户端封装."""
 
 import requests
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from sml.manager.config import Config
+from sml.utils.captcha import verify_captcha
 
 BASE_URL = "https://api.mefrp.com/api"
-CAPTCHA_URL = "https://www.mefrp.com/3rdparty/captcha"
 
 
 class APIError(Exception):
@@ -86,25 +86,11 @@ class MEFrpAPI:
     def _post(self, path: str, **kwargs) -> Any:
         return self._request("POST", path, **kwargs)
 
-    # ------------------------------------------------------------------ #
-    # 人机验证帮助
-    # ------------------------------------------------------------------ #
-
-    @staticmethod
-    def get_captcha_url(client_name: str = "SML") -> str:
-        """返回人机验证页面的 URL，提示用户打开并完成验证。"""
-        return f"{CAPTCHA_URL}?client={client_name}"
-
-    @staticmethod
-    def decode_captcha_token(encoded: str) -> Optional[str]:
-        """解码用户从人机验证页面获取的 token（Base64 解码后取 token||client 的第一段）。"""
-        import base64
-        try:
-            decoded = base64.b64decode(encoded.encode()).decode()
-            token = decoded.split("||")[0]
-            return token
-        except Exception:
-            return None
+    def _verify_captcha(
+        self,
+        on_progress: Optional[Callable[[int], None]] = None,
+    ) -> str:
+        return verify_captcha(session=self._session, on_progress=on_progress)
 
     # ------------------------------------------------------------------ #
     # 公共信息
@@ -119,29 +105,17 @@ class MEFrpAPI:
         return self._get("/public/store/products", auth_required=False)
 
     # ------------------------------------------------------------------ #
-    # 注册 / 登录
+    # 登录
     # ------------------------------------------------------------------ #
 
-    def get_email_code(self, email: str, captcha_token: str) -> str:
-        """获取邮箱注册验证码。"""
-        data = self._post("/public/register/emailCode", json_data={
-            "email": email,
-            "captchaToken": captcha_token,
-        }, auth_required=False)
-        return data  # 成功时 data 为 null，message 包含提示
-
-    def register(self, username: str, email: str, email_code: str, password: str) -> str:
-        """注册新账户。"""
-        data = self._post("/public/register", json_data={
-            "username": username,
-            "email": email,
-            "emailCode": email_code,
-            "password": password,
-        }, auth_required=False)
-        return data
-
-    def login(self, username: str, password: str, captcha_token: str) -> str:
-        """密码登录，成功后将 token 自动存入配置。返回 token。"""
+    def login(
+        self,
+        username: str,
+        password: str,
+        on_captcha_progress: Optional[Callable[[int], None]] = None,
+    ) -> str:
+        """完成隐式验证并登录，成功后保存并返回 token。"""
+        captcha_token = self._verify_captcha(on_captcha_progress)
         url = f"{BASE_URL}/public/login"
         headers = {"User-Agent": "SML/1.0.0 (Linux TUI Client; https://github.com/sml)"}
 
@@ -254,8 +228,12 @@ class MEFrpAPI:
         """获取当前用户信息。"""
         return self._get("/auth/user/info")
 
-    def sign_in(self, captcha_token: str) -> str:
-        """签到（需人机验证）。"""
+    def sign_in(
+        self,
+        on_captcha_progress: Optional[Callable[[int], None]] = None,
+    ) -> str:
+        """完成隐式验证并签到。"""
+        captcha_token = self._verify_captcha(on_captcha_progress)
         return self._post("/auth/user/sign", json_data={"captchaToken": captcha_token})
 
     def get_frp_token(self) -> str:
@@ -269,8 +247,12 @@ class MEFrpAPI:
         """获取用户组信息。"""
         return self._get("/auth/user/groups")
 
-    def reset_access_key(self, captcha_token: str) -> dict:
-        """重置访问密钥（需人机验证）。返回新密钥。"""
+    def reset_access_key(
+        self,
+        on_captcha_progress: Optional[Callable[[int], None]] = None,
+    ) -> dict:
+        """完成隐式验证并重置访问密钥。"""
+        captcha_token = self._verify_captcha(on_captcha_progress)
         return self._post("/auth/user/tokenReset", json_data={"captchaToken": captcha_token})
 
     def change_password(self, old_password: str, new_password: str) -> str:
@@ -339,10 +321,3 @@ class MEFrpAPI:
     def get_popup_notice(self) -> str:
         """获取重要公告（Markdown）。"""
         return self._get("/auth/popupNotice")
-
-
-# 更方便的 setter —— 手动设置 token（登录后从 UI 获取）
-def set_token_direct(token: str):
-    """在 UI 层手动设置 token。"""
-    cfg = Config()
-    cfg.token = token

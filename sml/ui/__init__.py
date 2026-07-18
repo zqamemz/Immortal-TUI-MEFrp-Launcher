@@ -1,7 +1,6 @@
 """SML TUI 界面模块."""
 
 from sml.ui.login_screen import LoginScreen
-from sml.ui.register_screen import RegisterScreen
 from sml.ui.main_screen import MainScreen, QuitConfirmScreen
 from sml.ui.tunnel_list_screen import TunnelListScreen
 from sml.ui.tunnel_create_screen import TunnelCreateScreen
@@ -12,7 +11,6 @@ from sml.ui.settings_screen import SettingsScreen
 
 __all__ = [
     "LoginScreen",
-    "RegisterScreen",
     "MainScreen",
     "QuitConfirmScreen",
     "TunnelListScreen",

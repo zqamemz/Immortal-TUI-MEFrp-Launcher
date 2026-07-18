@@ -6,7 +6,6 @@ from textual.screen import Screen
 
 from sml.manager.config import Config
 from sml.ui.login_screen import LoginScreen
-from sml.ui.register_screen import RegisterScreen
 from sml.ui.main_screen import MainScreen, QuitConfirmScreen
 from sml.ui.tunnel_list_screen import TunnelListScreen
 from sml.ui.tunnel_create_screen import TunnelCreateScreen
@@ -201,7 +200,6 @@ class SMLApp(App):
 
     SCREENS = {
         "login": LoginScreen,
-        "register": RegisterScreen,
         "main": MainScreen,
         "quit_confirm": QuitConfirmScreen,
         "tunnel_list": TunnelListScreen,

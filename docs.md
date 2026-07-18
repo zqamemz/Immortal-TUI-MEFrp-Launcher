@@ -4,15 +4,13 @@
 - [有关此文档的说明](https://apidoc.mefrp.com/%E6%9C%89%E5%85%B3%E6%AD%A4%E6%96%87%E6%A1%A3%E7%9A%84%E8%AF%B4%E6%98%8E-6889388m0.md): 
 - [数据时效性](https://apidoc.mefrp.com/%E6%95%B0%E6%8D%AE%E6%97%B6%E6%95%88%E6%80%A7-6352174m0.md): 
 - [有关人机验证的提醒](https://apidoc.mefrp.com/%E6%9C%89%E5%85%B3%E4%BA%BA%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%9A%84%E6%8F%90%E9%86%92-6889302m0.md): 
-- 注册/登录 [Magic Link 登陆相关](https://apidoc.mefrp.com/magic-link-%E7%99%BB%E9%99%86%E7%9B%B8%E5%85%B3-6352159m0.md): 
+- 登录 [Magic Link 登陆相关](https://apidoc.mefrp.com/magic-link-%E7%99%BB%E9%99%86%E7%9B%B8%E5%85%B3-6352159m0.md):
 
 ## API Docs
 - 公共信息 [统计信息](https://apidoc.mefrp.com/%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF-277844658e0.md): 获取用户数量、节点数量、隧道数量、已承载流量
 - 公共信息 [获取商城商品](https://apidoc.mefrp.com/%E8%8E%B7%E5%8F%96%E5%95%86%E5%9F%8E%E5%95%86%E5%93%81-380546276e0.md): 获取商城商品
-- 注册/登录 [获取邮件注册验证码](https://apidoc.mefrp.com/%E8%8E%B7%E5%8F%96%E9%82%AE%E4%BB%B6%E6%B3%A8%E5%86%8C%E9%AA%8C%E8%AF%81%E7%A0%81-277864456e0.md): > 此端点需要进行人机验证传参，详见[此文档](%E6%9C%89%E5%85%B3%E4%BA%BA%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%9A%84%E6%8F%90%E9%86%92-6889302m0)
-- 注册/登录 [注册账户](https://apidoc.mefrp.com/%E6%B3%A8%E5%86%8C%E8%B4%A6%E6%88%B7-277857655e0.md): 使用邮箱注册账户，需要先获取邮件注册验证码
-- 注册/登录 [密码登录](https://apidoc.mefrp.com/%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95-277868573e0.md): > 此端点需要进行人机验证传参，详见[此文档](%E6%9C%89%E5%85%B3%E4%BA%BA%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%9A%84%E6%8F%90%E9%86%92-6889302m0)
-- 注册/登录 [找回账户](https://apidoc.mefrp.com/%E6%89%BE%E5%9B%9E%E8%B4%A6%E6%88%B7-277874930e0.md): 找回账户
+- 登录 [密码登录](https://apidoc.mefrp.com/%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95-277868573e0.md): > 此端点需要进行人机验证传参，详见[此文档](%E6%9C%89%E5%85%B3%E4%BA%BA%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%9A%84%E6%8F%90%E9%86%92-6889302m0)
+- 登录 [找回账户](https://apidoc.mefrp.com/%E6%89%BE%E5%9B%9E%E8%B4%A6%E6%88%B7-277874930e0.md): 找回账户
 - 隧道相关 [获取创建隧道所需的所有数据](https://apidoc.mefrp.com/%E8%8E%B7%E5%8F%96%E5%88%9B%E5%BB%BA%E9%9A%A7%E9%81%93%E6%89%80%E9%9C%80%E7%9A%84%E6%89%80%E6%9C%89%E6%95%B0%E6%8D%AE-418624811e0.md): 
 - 隧道相关 [获取隧道列表](https://apidoc.mefrp.com/%E8%8E%B7%E5%8F%96%E9%9A%A7%E9%81%93%E5%88%97%E8%A1%A8-380471021e0.md): 获取隧道列表
 - 隧道相关 [创建隧道](https://apidoc.mefrp.com/%E5%88%9B%E5%BB%BA%E9%9A%A7%E9%81%93-416605311e0.md): 创建隧道（新版本，适用于 ME Frp 0.65.0+
