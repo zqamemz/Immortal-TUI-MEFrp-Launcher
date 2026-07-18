@@ -1,2 +1,0 @@
-[console_scripts]
-sml = sml.__main__:main
