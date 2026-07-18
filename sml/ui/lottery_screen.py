@@ -110,15 +110,23 @@ class LotteryScreen(Screen):
                     count = remaining
                     last_draw = 0
 
-                card1 = Vertical(classes="lottery-stat")
-                card1.mount(Static("剩余次数", classes="label"))
-                card1.mount(Static(str(count), classes="value"))
-                grid.mount(card1)
-
-                card2 = Vertical(classes="lottery-stat")
-                card2.mount(Static("上次抽取", classes="label"))
-                card2.mount(Static(format_timestamp(last_draw) if isinstance(last_draw, int) else str(last_draw), classes="value"))
-                grid.mount(card2)
+                grid.mount(
+                    Vertical(
+                        Static("剩余次数", classes="label"),
+                        Static(str(count), classes="value"),
+                        classes="lottery-stat",
+                    ),
+                    Vertical(
+                        Static("上次抽取", classes="label"),
+                        Static(
+                            format_timestamp(last_draw)
+                            if isinstance(last_draw, int)
+                            else str(last_draw),
+                            classes="value",
+                        ),
+                        classes="lottery-stat",
+                    ),
+                )
 
         except Exception as e:
             self._msg(f"加载信息失败: {e}")

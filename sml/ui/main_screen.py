@@ -172,10 +172,13 @@ class MainScreen(Screen):
             ("我的隧道", str(proxies)),
             ("状态", "已登录"),
         ]:
-            card = Vertical(classes="stat-card")
-            card.mount(Static(value, classes="stat-value"))
-            card.mount(Static(label, classes="stat-label"))
-            grid.mount(card)
+            grid.mount(
+                Vertical(
+                    Static(value, classes="stat-value"),
+                    Static(label, classes="stat-label"),
+                    classes="stat-card",
+                )
+            )
 
     def _build_menu(self):
         grid = self.query_one("#menu-grid")
