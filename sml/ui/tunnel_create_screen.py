@@ -5,6 +5,7 @@ from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.screen import Screen
 from textual.widgets import Button, Input, Label, Header, Footer, Static, Select
 from textual import work
+from rich.text import Text
 
 from sml.api.client import MEFrpAPI, APIError
 
@@ -279,7 +280,7 @@ class TunnelCreateScreen(Screen):
             # 区域标题
             count = len(items)
             region_title = Static(
-                f"  {region} ({count})",
+                Text(f"  {region} ({count})", style="#ff9e64"),
                 classes="node-sep",
             )
             node_list.mount(region_title)
@@ -323,35 +324,41 @@ class TunnelCreateScreen(Screen):
 
         children = []
 
-        # 标题行: # ID 名称 [VIP] [过载]
-        header_parts = f"[bold #c0d0e0]# {nid} {name}[/]"
+        # 标题行: # ID 名称 VIP 过载
+        header = Text()
+        header.append(f"# {nid} {name}", style="bold #c0d0e0")
         if is_vip:
-            header_parts += "  [bold #e67e22]VIP[/]"
+            header.append("  VIP", style="bold #e67e22")
         if is_overload:
-            header_parts += "  [bold #c0392b]过载[/]"
-        children.append(Static(header_parts, classes="node-header"))
+            header.append("  过载", style="bold #c0392b")
+        children.append(Static(header, classes="node-header"))
 
         # 标签行: TCP UDP 200Mbps
-        tag_parts = []
+        tags = Text()
+        first = True
         for proto, color in protocols:
-            tag_parts.append(f"[{color}]{proto}[/]")
+            if not first:
+                tags.append("  ")
+            tags.append(proto, style=color)
+            first = False
         if bandwidth:
-            tag_parts.append(f"[#7dcfff on #2d3a4f] {bandwidth} [/]")
-        if tag_parts:
-            children.append(Static("  ".join(tag_parts), classes="node-tags"))
+            if not first:
+                tags.append("  ")
+            tags.append(f" {bandwidth} ", style="#7dcfff on #2d3a4f")
+        if len(tags) > 0:
+            children.append(Static(tags, classes="node-tags"))
 
         # 描述
         if desc:
             desc_text = str(desc)[:80]
-            children.append(Static(f"[#565f89]{desc_text}[/]", classes="node-desc"))
+            children.append(Static(Text(desc_text, style="#565f89"), classes="node-desc"))
 
         # 负载条
         load_pct = self._parse_load(load)
-        load_bar_widget = self._make_load_bar(load_pct)
-        children.append(load_bar_widget)
+        children.append(self._make_load_bar(load_pct))
 
         # 分隔线
-        children.append(Static("[#3b4261]" + "─" * 30 + "[/]", classes="node-sep"))
+        children.append(Static(Text("─" * 30, style="#3b4261"), classes="node-sep"))
 
         return Vertical(*children, classes=card_class, id=f"node-card-{nid}")
 
@@ -375,16 +382,19 @@ class TunnelCreateScreen(Screen):
         empty = bar_width - filled
 
         if pct >= 100:
-            bar_cls = "load-bar-full"
+            color = "#c0392b"
         elif pct >= 80:
-            bar_cls = "load-bar-danger"
+            color = "#e74c3c"
         elif pct >= 50:
-            bar_cls = "load-bar-warn"
+            color = "#e67e22"
         else:
-            bar_cls = "load-bar"
+            color = "#27ae60"
 
-        bar_text = f"[{bar_cls}]{'█' * filled}[/]{bar_cls}{'░' * empty}[/]  {pct}% 负载"
-        return Static(bar_text, classes="node-load")
+        bar = Text()
+        bar.append("█" * filled, style=color)
+        bar.append("░" * empty, style="#3b4261")
+        bar.append(f"  {pct}% 负载", style="#565f89")
+        return Static(bar, classes="node-load")
 
     # ------------------------------------------------------------------ #
     # 事件处理
