@@ -6,7 +6,7 @@ from pathlib import Path
 
 CONFIG_DIR = Path.home() / ".config" / "sml"
 CONFIG_FILE = CONFIG_DIR / "config.json"
-FRPC_BIN = "/usr/local/bin/frpc"
+FRPC_BIN = "/usr/local/bin/mefrpc"
 SML_TUNNELS_DIR = Path("/etc/sml/tunnels")
 SYSTEMD_SERVICE_PREFIX = "sml-tunnel-"
 
