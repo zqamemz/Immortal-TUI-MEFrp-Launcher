@@ -34,6 +34,8 @@ class LotteryScreen(Screen):
 
     #lottery-stats {
         height: auto;
+        grid-size: 2 1;
+        grid-columns: 1fr 1fr;
         margin-bottom: 1;
     }
 

@@ -23,6 +23,19 @@ ok()    { printf "${GREEN}[OK]${NC}   %s\n" "$*"; }
 warn()  { printf "${YELLOW}[WARN]${NC} %s\n" "$*"; }
 fail()  { printf "${RED}[FAIL]${NC} %s\n" "$*"; exit 1; }
 
+# ── sudo 处理 ───────────────────────────────────────────────────────────────────
+# 若安装目录需要 root 权限写入（/opt、/usr/local），自动加 sudo
+SUDO=""
+if [ "$(id -u)" -ne 0 ]; then
+    if ! [ -w "$(dirname "$INSTALL_DIR")" ] || ! [ -w "$(dirname "$BIN_SML")" ] 2>/dev/null; then
+        if command -v sudo &>/dev/null; then
+            SUDO="sudo"
+        else
+            warn "当前用户无写入权限且未找到 sudo，安装可能失败"
+        fi
+    fi
+fi
+
 # ── 检测 Python ─────────────────────────────────────────────────────────────────
 info "检测 Python 版本..."
 PYTHON=""
@@ -34,14 +47,13 @@ for cmd in python3 python python3.12 python3.11 python3.10 python3.9 python3.8; 
 done
 
 [ -z "$PYTHON" ] && fail "未找到 Python 3.8+，请先安装 Python。"
-PYTHON_VERSION=$($PYTHON --version 2>&1)
-info "使用 Python: $PYTHON ($PYTHON_VERSION)"
 
-MAJOR=$($PYTHON -c "import sys; print(sys.version_info.major)")
-MINOR=$($PYTHON -c "import sys; print(sys.version_info.minor)")
+MAJOR=$($PYTHON -c "import sys; print(sys.version_info.major)" 2>/dev/null || echo 0)
+MINOR=$($PYTHON -c "import sys; print(sys.version_info.minor)" 2>/dev/null || echo 0)
 if [ "$MAJOR" -lt 3 ] || { [ "$MAJOR" -eq 3 ] && [ "$MINOR" -lt 8 ]; }; then
     fail "Python 版本需要 >= 3.8，当前是 $MAJOR.$MINOR"
 fi
+info "使用 Python: $PYTHON ($($PYTHON --version 2>&1))"
 
 # ── 克隆/更新项目 ──────────────────────────────────────────────────────────────
 if [ -d "$INSTALL_DIR/.git" ]; then
@@ -50,10 +62,15 @@ if [ -d "$INSTALL_DIR/.git" ]; then
     git pull || warn "git pull 失败，继续安装..."
 else
     info "克隆项目到 $INSTALL_DIR..."
-    mkdir -p "$(dirname "$INSTALL_DIR")"
-    git clone https://github.com/zqamemz/Immortal-TUI-MEFrp-Launcher.git "$INSTALL_DIR" \
+    $SUDO mkdir -p "$(dirname "$INSTALL_DIR")"
+    $SUDO git clone https://github.com/zqamemz/Immortal-TUI-MEFrp-Launcher.git "$INSTALL_DIR" \
         || fail "克隆失败，请检查网络连接"
     cd "$INSTALL_DIR"
+fi
+
+# 非 root 运行时下放目录权限，避免后续 pip 写入失败
+if [ "$(id -u)" -ne 0 ] && [ -d "$INSTALL_DIR" ]; then
+    $SUDO chown -R "$(id -u):$(id -g)" "$INSTALL_DIR" 2>/dev/null || true
 fi
 
 # ── 创建虚拟环境 ────────────────────────────────────────────────────────────────
@@ -61,21 +78,22 @@ if [ -d "$VENV_DIR" ]; then
     info "虚拟环境已存在: $VENV_DIR"
 else
     info "创建虚拟环境: $VENV_DIR"
-    $PYTHON -m venv "$VENV_DIR" || fail "创建虚拟环境失败"
+    $PYTHON -m venv "$VENV_DIR" || fail "创建虚拟环境失败（可能缺少 python3-venv，请先安装）"
 fi
 
 # ── 安装依赖 ────────────────────────────────────────────────────────────────────
 info "安装依赖..."
+# shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
-pip install -U pip -q 2>/dev/null || true
-pip install -r requirements.txt -q
-pip install -e . -q
+pip install -U pip setuptools wheel -q 2>/dev/null || true
+pip install -r requirements.txt -q || fail "安装 requirements.txt 失败"
+pip install -e . -q || fail "pip install -e . 失败"
 ok "依赖安装完成"
 
 # ── 生成 /usr/local/bin/sml 包装脚本 ──────────────────────────────────────────
 info "生成 sml 命令..."
 
-$PYTHON - "$VENV_DIR" "$BIN_SML" << 'PYEOF'
+$SUDO $PYTHON - "$VENV_DIR" "$BIN_SML" << 'PYEOF'
 import sys, os, stat
 
 venv_dir   = sys.argv[1]
@@ -90,11 +108,15 @@ content = (
 
 with open(bin_sml, "w") as f:
     f.write(content)
-os.chmod(bin_sml, os.stat(bin_sml).st_mode | stat.S_IEXEC)
+os.chmod(bin_sml, os.stat(bin_sml).st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
 print(f"已生成: {bin_sml}")
 PYEOF
 
 ok "已安装: $BIN_SML"
+
+# ── 安装内置 mefrpc ─────────────────────────────────────────────────────────────
+info "安装内置 mefrpc..."
+"$VENV_DIR/bin/python" -c "from sml.installer import install; print(install())" 2>/dev/null || ok "mefrpc 安装跳过（首次启动时会自动安装）"
 
 # ── 完成 ────────────────────────────────────────────────────────────────────────
 echo ""

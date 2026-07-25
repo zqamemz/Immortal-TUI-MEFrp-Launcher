@@ -192,6 +192,9 @@ class TunnelListScreen(Screen):
                 valid_ids = [pid for pid, _ in valid_proxies if pid is not None]
                 status_map = get_all_tunnel_status(valid_ids) if valid_ids else {}
 
+                # 维护与表格行一一对应的列表，避免 cursor 索引错位
+                self.displayed_proxies = []
+
                 for pid, p in valid_proxies:
                     if not isinstance(p, dict):
                         continue
@@ -217,6 +220,7 @@ class TunnelListScreen(Screen):
 
                     domain = p.get("domain", p.get("customDomain", ""))
                     table.add_row(str(raw_id), name, ptype, node, str(local), status, online, str(domain))
+                    self.displayed_proxies.append(p)
 
             if isinstance(msg, Static):
                 msg.update(f"共 {len(self.proxies)} 条隧道")
@@ -232,9 +236,10 @@ class TunnelListScreen(Screen):
         if not isinstance(table, DataTable):
             return {}
         cursor = table.cursor_row
-        if cursor is None or cursor >= len(self.proxies):
+        displayed = getattr(self, "displayed_proxies", None)
+        if displayed is None or cursor is None or cursor >= len(displayed):
             return {}
-        return self.proxies[cursor]
+        return displayed[cursor]
 
     def view_detail(self):
         proxy = self.get_selected()

@@ -97,6 +97,13 @@ def uninstall() -> tuple[bool, str]:
     if not INSTALL_PATH.exists():
         return True, "meFrpc 未安装，无需卸载"
 
+    # 先清理可能残留的 systemd 服务，避免指向已删除的二进制
+    try:
+        from sml.manager.systemd import remove_all_tunnel_services
+        remove_all_tunnel_services()
+    except Exception:
+        pass
+
     try:
         INSTALL_PATH.unlink()
     except PermissionError:

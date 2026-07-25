@@ -257,6 +257,20 @@ def get_all_tunnel_services() -> list[int]:
     return ids
 
 
+def remove_all_tunnel_services() -> list[str]:
+    """卸载所有 SML 隧道 systemd 服务（用于 mefrpc 卸载前清理）。
+
+    Returns:
+        清理过程中的消息列表。
+    """
+    ids = get_all_tunnel_services()
+    msgs = []
+    for pid in ids:
+        ok, msg = remove_tunnel_service(pid)
+        msgs.append(f"  [{'✓' if ok else '✗'}] 隧道 #{pid}: {msg}")
+    return msgs
+
+
 def stop_all_tunnels() -> tuple[int, list[str]]:
     """停止所有 SML 隧道。返回 (数量, 消息列表)。"""
     ids = get_all_tunnel_services()
