@@ -85,11 +85,11 @@ class SettingsScreen(Screen):
         self._set_input("s-username", settings.get("username", ""))
 
         # 检测 frpc
-        frpc = check_frpc()
+        frpc_ok, frpc_msg = check_frpc()
         msg = self.query_one("#settings-msg")
         if isinstance(msg, Static):
-            if frpc:
-                msg.update(f"✓ frpc 已检测到: {frpc}")
+            if frpc_ok:
+                msg.update(f"✓ {frpc_msg}")
                 msg.styles.color = "#27ae60"
             else:
                 msg.update("⚠ 未检测到 frpc，请设置正确路径")

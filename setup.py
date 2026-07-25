@@ -3,10 +3,7 @@ import os
 from pathlib import Path
 
 # 将 mefrpc 纳入 package data
-package_data = {"sml": []}
-mefrpc_path = Path(__file__).parent / "sml" / "mefrpc"
-if mefrpc_path.exists():
-    package_data["sml"].append("mefrpc")
+package_data = {"sml": ["mefrpc", "mefrpc.exe"]}
 
 setup(
     name="sml",
@@ -17,9 +14,9 @@ setup(
     include_package_data=True,
     python_requires=">=3.8",
     install_requires=[
-        "textual>=1.0.0",
+        "textual>=1.0.0,<2.0.0",
         "requests>=2.25.0",
-        "pyyaml>=5.1",
+        "pyyaml>=5.4",
     ],
     entry_points={
         "console_scripts": [

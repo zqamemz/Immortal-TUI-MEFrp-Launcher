@@ -100,9 +100,6 @@ class Config:
         self._data["use_sudo"] = value
         self._save()
 
-    def get_all(self) -> dict:
-        return dict(self._data)
-
     def clear_all(self):
         self._data = {}
         self._save()

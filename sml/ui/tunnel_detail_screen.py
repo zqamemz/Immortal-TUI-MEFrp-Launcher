@@ -125,7 +125,8 @@ class TunnelDetailScreen(Screen):
             table = self.query_one("#proxy-config")
             if isinstance(table, DataTable):
                 table.clear()
-                table.add_columns("配置项", "值")
+                if not table.columns:
+                    table.add_columns("配置项", "值")
                 for k, v in self.proxy_data.items():
                     table.add_row(str(k), str(v)[:60])
 
@@ -149,8 +150,8 @@ class TunnelDetailScreen(Screen):
             if not check_root():
                 self._msg("提示: systemd 管理需要 root 权限", error=True)
             else:
-                frpc = check_frpc()
-                if not frpc:
+                frpc_ok, frpc_msg = check_frpc()
+                if not frpc_ok:
                     self._msg("提示: 未检测到 frpc，请先在设置中配置 frpc 路径", error=True)
                 else:
                     self._msg("frpc 可用", error=False)
@@ -165,7 +166,7 @@ class TunnelDetailScreen(Screen):
             return
         btn = None
         try:
-            btn = self.query_one("#btn-install")
+            btn = self.query_one("#svc-install")
             if isinstance(btn, Button):
                 btn.disabled = True
                 btn.label = "安装中..."
@@ -205,12 +206,17 @@ class TunnelDetailScreen(Screen):
             return
         try:
             if action == "start":
-                start_tunnel(self.proxy_id)
+                ok, msg = start_tunnel(self.proxy_id)
             elif action == "stop":
-                stop_tunnel(self.proxy_id)
+                ok, msg = stop_tunnel(self.proxy_id)
             elif action == "restart":
-                restart_tunnel(self.proxy_id)
-            self._msg(f"{action} 成功", error=False)
+                ok, msg = restart_tunnel(self.proxy_id)
+            else:
+                return
+            if ok:
+                self._msg(f"{action} 成功", error=False)
+            else:
+                self._msg(f"{action} 失败: {msg}", error=True)
             self.refresh_data()
         except Exception as e:
             self._msg(f"{action} 失败: {e}")

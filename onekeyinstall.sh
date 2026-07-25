@@ -11,7 +11,6 @@ REPO_URL="https://github.com/zqamemz/Immortal-TUI-MEFrp-Launcher.git"
 INSTALL_DIR="/opt/sml"
 VENV_DIR="$INSTALL_DIR/venv"
 BIN_SML="/usr/local/bin/sml"
-BIN_SML_INSTALL="/usr/local/bin/sml-install"
 
 # ── 颜色输出 ────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -91,15 +90,6 @@ install_system_deps() {
             warn "未知包管理器，跳过系统依赖自动安装。请手动确认 python3 / venv / pip 可用。"
             ;;
     esac
-}
-
-# ── 确保基础工具可用 ────────────────────────────────────────────────────────────
-ensure_tool() {
-    local tool="$1"; local pkg="$2"
-    if ! command -v "$tool" &>/dev/null; then
-        info "缺少 $tool，尝试安装..."
-        install_system_deps
-    fi
 }
 
 # 先确保 git 和 python3 存在
@@ -196,8 +186,8 @@ create_venv() {
         return 0
     fi
 
-    # 方法 4: 让 pip 安装 virtualenv 后重试
-    if $PYTHON -m pip install -q virtualenv 2>/dev/null && "$VENV_DIR/../bin/virtualenv" "$VENV_DIR" 2>/dev/null; then
+    # 方法 4: 让 pip 安装 virtualenv 后用 python -m virtualenv 创建
+    if $PYTHON -m pip install -q virtualenv 2>/dev/null && $PYTHON -m virtualenv "$VENV_DIR" 2>/dev/null; then
         ok "virtualenv 创建成功 (pip)"
         return 0
     fi
@@ -239,7 +229,7 @@ content = (
 
 with open(bin_sml, "w") as f:
     f.write(content)
-os.chmod(bin_sml, os.stat(bin_sml).st_mode | stat.S_IEXEC)
+os.chmod(bin_sml, os.stat(bin_sml).st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
 print(f"已生成: {bin_sml}")
 PYEOF
 

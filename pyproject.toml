@@ -14,16 +14,16 @@ classifiers = [
     "Topic :: System :: Systems Administration",
 ]
 dependencies = [
-    "textual>=1.0.0",
+    "textual>=1.0.0,<2.0.0",
     "requests>=2.25.0",
-    "pyyaml>=5.1",
+    "pyyaml>=5.4",
 ]
 
 [project.scripts]
 sml = "sml.__main__:main"
 
 [tool.setuptools.package-data]
-sml = ["mefrpc"]
+sml = ["mefrpc", "mefrpc.exe"]
 
 [build-system]
 requires = ["setuptools>=64.0", "wheel"]
