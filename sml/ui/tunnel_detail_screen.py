@@ -127,8 +127,29 @@ class TunnelDetailScreen(Screen):
                 table.clear()
                 if not table.columns:
                     table.add_columns("配置项", "值")
-                for k, v in self.proxy_data.items():
-                    table.add_row(str(k), str(v)[:60])
+                
+                # 如果 proxy_data 有 config 字段且是字符串（TOML配置文本），分行展示
+                if "config" in self.proxy_data and isinstance(self.proxy_data.get("config"), str):
+                    config_text = self.proxy_data["config"]
+                    for line in config_text.splitlines():
+                        line = line.strip()
+                        if line and not line.startswith("#"):
+                            # 简单分割 key = value
+                            if "=" in line:
+                                parts = line.split("=", 1)
+                                key = parts[0].strip()
+                                val = parts[1].strip().strip("'\"")
+                                table.add_row(key, val[:60])
+                            else:
+                                table.add_row("配置", line[:60])
+                    # 显示其他元数据（type等）
+                    for k, v in self.proxy_data.items():
+                        if k != "config":
+                            table.add_row(f"[meta] {k}", str(v)[:60])
+                else:
+                    # 常规 dict 展开
+                    for k, v in self.proxy_data.items():
+                        table.add_row(str(k), str(v)[:60])
 
             # 检查 systemctl 状态
             status = get_tunnel_status(self.proxy_id)
