@@ -79,12 +79,22 @@ class TunnelCreateScreen(Screen):
         height: auto;
     }
 
+    .node-card:hover {
+        background: #2a2f45;
+        border: solid #565f89;
+    }
+
     .node-card-selected {
         background: #24283b;
         border: solid #2680eb;
         padding: 1 2;
         margin: 0 0 1 0;
         height: auto;
+    }
+
+    .node-card-selected:hover {
+        background: #2a2f45;
+        border: solid #2680eb;
     }
 
     .node-header {
@@ -101,6 +111,11 @@ class TunnelCreateScreen(Screen):
         color: #565f89;
         height: auto;
         max-height: 3;
+    }
+
+    .node-ports {
+        color: #7dcfff;
+        height: 1;
     }
 
     .node-load {
@@ -305,7 +320,19 @@ class TunnelCreateScreen(Screen):
         bandwidth = node.get("bandwidth", node.get("rate", node.get("maxBandwidth", "")))
         is_vip = node.get("isVip", node.get("vip", False))
         is_overload = node.get("isOverload", node.get("overload", False))
-        load = node.get("load", node.get("usage", 0))
+        
+        # 负载计算：优先从 load 字段，否则从 tunnelCount/totalTunnel 计算
+        load = node.get("load", node.get("usage", None))
+        if load is None:
+            tunnel_count = node.get("tunnelCount", node.get("currentTunnels", 0))
+            total_tunnel = node.get("totalTunnel", node.get("maxTunnels", 0))
+            if total_tunnel > 0:
+                load = int((tunnel_count / total_tunnel) * 100)
+            else:
+                load = 0
+
+        # 允许端口范围
+        allow_ports = node.get("allowPorts", node.get("ports", node.get("portRange", "")))
 
         # 支持的协议
         protocols = []
@@ -353,6 +380,13 @@ class TunnelCreateScreen(Screen):
             desc_text = str(desc)[:80]
             children.append(Static(Text(desc_text, style="#565f89"), classes="node-desc"))
 
+        # 允许端口范围（新增）
+        if allow_ports:
+            port_text = Text()
+            port_text.append("允许端口: ", style="#565f89")
+            port_text.append(str(allow_ports), style="#7dcfff")
+            children.append(Static(port_text, classes="node-ports"))
+
         # 负载条
         load_pct = self._parse_load(load)
         children.append(self._make_load_bar(load_pct))
@@ -399,6 +433,21 @@ class TunnelCreateScreen(Screen):
     # ------------------------------------------------------------------ #
     # 事件处理
     # ------------------------------------------------------------------ #
+
+    def on_click(self, event):
+        """点击节点卡片时同步选择该节点。"""
+        # 查找点击目标是否在节点卡片内
+        target = event.widget
+        while target and target != self:
+            if hasattr(target, "id") and target.id and target.id.startswith("node-card-"):
+                nid = target.id.replace("node-card-", "")
+                # 更新下拉框选中值
+                select = self.query_one("#t-node")
+                if isinstance(select, Select):
+                    select.value = nid
+                # 高亮会在 on_select_changed 中自动处理
+                break
+            target = target.parent
 
     def on_select_changed(self, event: Select.Changed):
         """节点下拉选择变化时，高亮对应的节点卡片。"""
