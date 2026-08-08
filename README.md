@@ -442,8 +442,8 @@ A: 先激活虚拟环境，执行 `sml-install`，或在 **设置** 中填写正
 **Q: Systemd 按钮无效？**  
 A: 需要 Linux + systemd，并以 root 运行，或配置好 sudo；先在隧道详情中「安装服务」。
 
-**Q: SSH 里 Ctrl+V 粘贴不了？**  
-A: 程序会打开手动粘贴页，在输入框中粘贴后确认即可。
+**Q: SSH 里 Ctrl+V 粘贴不了？**
+A: 程序会自动识别当前环境：会桥接剪贴板的工具（MobaXterm、VS Code Remote、WSL、Termux）直接走系统剪贴板；普通 SSH 会话（OpenSSH、Xshell、SecureCRT、PuTTY、Termius 等）或 Linux 无图形环境则打开手动粘贴页，在输入框中粘贴后确认即可。
 
 **Q: 每次打开终端都要重新装依赖吗？**  
 A: 不需要。只要再次 `cd` 到项目目录并 `source venv/bin/activate` 后执行 `sml` 即可。

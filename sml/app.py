@@ -252,6 +252,10 @@ class SMLApp(App):
         """
         focused = self.focused
         if focused is not None and hasattr(focused, "value") and hasattr(focused, "cursor_position"):
+            # 已知无系统剪贴板的环境（SSH / 无头 Linux）直接走手动粘贴
+            if is_ssh_environment():
+                self._do_manual_paste(focused)
+                return
             # 先尝试系统剪贴板
             if paste_to_input(focused):
                 self.notify("已粘贴", severity="information", timeout=2)
