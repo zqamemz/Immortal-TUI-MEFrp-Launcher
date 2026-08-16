@@ -56,6 +56,37 @@
 
 ## 快速开始
 
+### 一键无人值守安装（全新服务器推荐）
+
+`onekeyinstall.sh` 支持从**全新系统**（无任何依赖）开始全程无人值守部署：自动检测发行版 → 安装系统依赖 → 获取 Python 3.8+ → 克隆项目 → 创建虚拟环境 → 安装依赖 → 生成 `sml` 命令 → 安装内置 mefrpc → 验证。
+
+| 发行版 | 包管理器 | 特殊处理 |
+|--------|----------|----------|
+| Debian / Ubuntu 系 | apt | 自动安装 python3-venv / 编译工具链 |
+| CentOS 7 / RHEL 7 | yum | 自动修复 EOL 源 → vault.centos.org；自动编译 OpenSSL 1.1.1 + Python 3.11 |
+| CentOS 8 / Rocky 8 / AlmaLinux 8 | dnf | 自动修复 EOL 源；默认 Python 3.6 时自动启用 python39 模块（失败回退源码编译） |
+| CentOS Stream 9 / Rocky 9 / AlmaLinux 9 / Fedora | dnf | 系统自带 Python 3.9+，开箱即用 |
+| Arch / Manjaro 系 | pacman | 开箱即用 |
+| Alpine | apk | 开箱即用 |
+
+```bash
+# 下载脚本后交互式安装（默认安装到 /opt/sml）
+bash onekeyinstall.sh
+
+# 全自动无人值守安装（不询问任何问题）
+bash onekeyinstall.sh -y
+
+# 自定义安装目录
+bash onekeyinstall.sh -y -d /usr/local/sml
+
+# 服务器管道方式一键安装
+curl -fsSL <脚本地址> | bash
+```
+
+可用选项：`-d/--install-dir`（安装目录）、`-r/--repo`（仓库地址）、`-b/--branch`（分支）、`-y/--yes`（全自动，装完不启动）、`--start`（装完自动启动 SML）、`--no-start`（强制不启动）。
+
+安装日志写入 `/tmp/onekeyinstall.log`。可选环境变量：`PY_MIRROR`（Python 源码下载镜像，默认华为云）、`PYTHON_BUILD_VER`（编译版本，默认 3.11.9）、`REPO_URL`、`BRANCH`。
+
 ### 一键安装（推荐）
 
 项目提供 `install.sh` 安装脚本，会在 `/opt/sml` 创建虚拟环境并安装所有依赖，同时生成 `/usr/local/bin/sml` 命令，之后**无需激活虚拟环境**即可直接运行。
