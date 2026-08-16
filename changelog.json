@@ -1,0 +1,103 @@
+{
+  "project": "Immortal-TUI-MEFrp-Launcher",
+  "versions": [
+    {
+      "version": "1.0.0",
+      "date": "2026-08-16",
+      "summary": "首个正式版 - 一键安装脚本支持多发行版无人值守部署",
+      "changes": {
+        "feat": [
+          "onekeyinstall.sh 支持 Debian/Ubuntu、CentOS/RHEL 7/8/9、Arch 等发行版从新机到 SML 部署完毕的全程无人值守安装",
+          "CentOS 7/8 自动修复 EOL 源为 vault.centos.org；CentOS 7 自动编译 OpenSSL 1.1.1 + Python 3.11，RHEL 8 系自动启用 python39 模块",
+          "无人值守增强 - 参数化安装目录/仓库/分支，非 TTY 不询问，git 失败回退源码包，安装后自动验证"
+        ]
+      },
+      "commits": ["7f06311"]
+    },
+    {
+      "version": "0.4.0",
+      "date": "2026-08-09",
+      "summary": "适配多种SSH工具环境检测",
+      "changes": {
+        "feat": [
+          "识别 Termux / Windows 及 macOS 本地终端/剪贴板桥接工具，SSH 自动回退手动粘贴"
+        ]
+      },
+      "commits": ["bfb2085"]
+    },
+    {
+      "version": "0.3.0",
+      "date": "2026-07-31",
+      "summary": "创建隧道界面增强",
+      "changes": {
+        "feat": [
+          "创建隧道界面增强 - 显示负载/端口范围/卡片可点击"
+        ],
+        "fix": [
+          "隧道详情配置展示 - 解析 TOML 字符串分行显示"
+        ]
+      },
+      "commits": ["4603299", "5348b02"]
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-07-26",
+      "summary": "多项修复与一键安装增强",
+      "changes": {
+        "fix": [
+          "修复隧道列表索引错位/抽奖 Grid 布局/install.sh 权限/mefrpc 卸载清理残留服务",
+          "代码审查修复 - check_frpc 元组误用/按钮 id 错误/DataTable 重复加列/服务动作返回值/清理死代码/打包配置",
+          "onekeyinstall.sh 增强虚拟环境创建回退和自动安装系统依赖"
+        ]
+      },
+      "commits": ["3a7beaf", "8688d29", "a48e646"]
+    },
+    {
+      "version": "0.1.1",
+      "date": "2026-07-21",
+      "summary": "添加 GNU GPLv3 许可证",
+      "changes": {
+        "chore": [
+          "添加 GNU GPLv3 协议",
+          "重新添加 LICENSE 文件"
+        ]
+      },
+      "commits": ["cf22f72", "a317338", "b708b1a"]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-07-19",
+      "summary": "一键安装脚本与代码审查修复",
+      "changes": {
+        "feat": [
+          "新增 onekeyinstall.sh 一键无人值守安装脚本",
+          "新增 install.sh 一键安装脚本，安装后无需激活虚拟环境即可运行 sml"
+        ],
+        "fix": [
+          "修正默认 frpc 路径为 mefrpc",
+          "代码审查修复 - 删除确认对话框/installer sudo/tunnel 批量查询/虚假 PID/端口校验",
+          "修复主页统计卡片 Grid 布局; 隧道列表增加在线状态列; 修复安装服务参数不匹配",
+          "使用 Rich Text 渲染节点卡片避免 markup 解析崩溃; 完善 README 文档"
+        ]
+      },
+      "commits": ["ca1c194", "6d90f6a", "6e1183e", "7a779a8", "9738e86", "061566a"]
+    },
+    {
+      "version": "0.0.1",
+      "date": "2026-07-18",
+      "summary": "初始发布 - TUI MEFrp 客户端",
+      "changes": {
+        "feat": [
+          "自动化验证码验证，移除注册流程",
+          "创建基于 TUI 的 MEFrp Linux SSH 第三方客户端"
+        ],
+        "chore": [
+          "忽略 Python 缓存和构建产物",
+          "更新 README",
+          "Mefrpc 安装器"
+        ]
+      },
+      "commits": ["30d841e", "c26db57", "c67a5de", "44f1aee", "9c74e25", "653474b"]
+    }
+  ]
+}
